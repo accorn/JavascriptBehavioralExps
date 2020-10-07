@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="robots" content="noindex">
+  <!--Basic HTML info. All plugins and CSS needs to be called -->
+  <title>Experiment</title>
+  <link href="static/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+</head>
+
+<body>
+  <script src="static/js/jspsych-6.0.1/jspsych.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-html-button-response.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-multi-select.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-multi-choice.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-text.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-likert.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-fullscreen.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="static/lib/jquery-min.js" type="text/javascript"></script>
+  <script src="static/lib/underscore-min.js" type="text/javascript"></script>
+  <script src="static/lib/backbone-min.js" type="text/javascript"></script>
+  <!--Below is the experiment javascript file -->
+  <script src='jatos.js'></script>
+  <noscript>
+              <h1>Warning: Javascript seems to be disabled</h1>
+              <p>This website requires that Javascript be enabled on your browser.</p>
+              <p>Instructions for enabling Javascript in your browser can be found
+              <a href="http://support.google.com/bin/answer.py?hl=en&answer=23852">here</a><p>
+  </noscript>
+  <script>
+
+    var timeline = []
+    var trialnum = 0
+    // Number of survey items wanted to show on screen. Will accept values that produce a remainder
+    var numPerPage = 4
+    var respMat = []
+    var question = ''
+    var instructText = '<p>This is a test to measure some of the ways in which you pay attention to things in different situations. Indicate how well each statement describes you, by clicking on one of the options for each statement.</p><p>Press any key to begin...</p>'
+    var VDAQRs = ['The opposite of me', 'Does not describe me well', 'Somewhat true of me', 'Very true of me']
+    var VDAQQs = [
+      'When I see an attractive person, I have a hard time taking my eyes off of them.',
+      'If the TV is on in the background, I find it very distracting.',
+      'I like to go window shopping (or browse items for sale on the internet) and look at items even if I know I cannot afford them.',
+      'When I daydream, it is often about things I want.',
+      'When tasty food is placed in the open, I find it very tempting.',
+      'I have an eye for beauty.',
+      'I tend to focus on the things I want more than the things I need or know are good for me.',
+      'Billboards really draw my attention.',
+      'The sights and sounds of a place like Las Vegas excite me.',
+      'When I see other people doing an activity I like, it makes me want to drop everything and join in.',
+      'I am much more likely to pursue something when the opportunity is right in front of me.',
+      'Seeing something makes me want it more.',
+      'I find it hard to focus on work when something fun or interesting is going on around me.',
+      'I never miss the text message sound on my phone or the email chime on my computer, and I read it right away even if it takes me away from what I am doing.',
+      'I am likely to buy one of the items featured on display at a store, even though I was not planning to when I entered the store.',
+      'I find unrewarding tasks to be boring and not worth paying much attention to when I do them.'
+    ]
+
+    // Vars that let us show the proper number of items per fullPages
+    // In the event that there are leftover questions, these vars Will
+    // make it to where those last items are shown by themselves
+    var iter = []
+    var iterPos = 0
+    var lastItems = VDAQQs.length%numPerPage
+    var fullPages = (VDAQQs.length-lastItems)/numPerPage
+    for (let i = 0; i < fullPages; i++) {
+      iter.push(numPerPage)
+    }
+    if (lastItems > 0){
+      iter.push(lastItems)
+    }
+
+      var sumFunc = (a,b) => a+b
+      var getQs = function(){
+        // Generate the correct number of items to show on screen
+        var QMat = []
+        for (let i = 0; i < iter[iterPos]; i++) {
+          QMat.push({prompt: VDAQQs[trialnum+i], name: 'VDAQ', options: VDAQRs, required:true, horizontal: true})
+        }
+          return QMat
+        }
+
+      var trialSave = function(){
+
+        var VDAQTotal = respMat.reduce(sumFunc)
+
+        return {
+          "VDAQResp":respMat,
+          "VDAQScore":VDAQTotal
+        }
+      }
+
+      var instrux = {
+        type: 'html-keyboard-response',
+        stimulus: instructText,
+        response_ends_trial: true
+      }
+
+      var multi_choice_block = {
+        type: 'survey-multi-choice',
+        questions: getQs,
+        on_finish:function(data){
+          trialnum = trialnum + numPerPage
+          iterPos = iterPos+1
+
+          var trialResp = JSON.parse(data.responses)
+
+          var ind = []
+          for (let i = 0; i < iter[iterPos-1]; i++) {
+            ind.push(trialResp["Q"+i])
+          }
+
+          // Convert strings to numeric values and save
+          for (let i = 0; i < (ind.length); i++) {
+            respMat.push(VDAQRs.indexOf(ind[i])+1)
+          }
+        }
+      };
+
+      var blackScreen = {
+        type: 'html-keyboard-response',
+        stimulus: '',
+        trial_duration: 500
+      }
+
+      var saveData = {
+        type: 'html-keyboard-response',
+        stimulus: 'You have completed this survey. Press any key to continue...',
+        data: trialSave,
+        response_ends_trial: true
+      }
+
+
+      timeline.push(instrux)
+
+      for (let i = 0; i < iter.length; i++) {
+        timeline.push(multi_choice_block)
+        timeline.push(blackScreen)
+      }
+      timeline.push(saveData)
+
+  	jatos.onLoad(function() {
+  		jsPsych.init({
+  			timeline: timeline,
+
+  			on_finish: function(data){ //edit this for the experiment
+
+          var dataMat = {
+            "VDAQResp":jsPsych.data.get().select('VDAQResp').values,
+            "VDAQScore":jsPsych.data.get().select('VDAQScore').values
+          }
+          //console.log(dataMat)
+          //var resultJson1 = jsPsych.data.get().csv(); //filterCustom({Save_Data: 'Save'}).
+          var resultJson = JSON.stringify(dataMat);
+          jatos.submitResultData(resultJson, jatos.startNextComponent)
+  			}
+  		});
+  	//}
+
+  });
+  </script>
+  </body>
+  </html>

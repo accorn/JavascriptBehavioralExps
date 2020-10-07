@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+
+<!-- The below stuff between the <head> tags will likely never need to be changed -->
+<head>
+  <meta charset="utf-8" />
+  <meta name="robots" content="noindex">
+  <title>Experiment</title>
+  <link href="staticFiles/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+</head>
+
+<!-- Below is where the experiment plugins and javascript is coded -->
+<body>
+
+  <!-- Below, are the main .js files that are needed to run, these will never change -->
+  <script src="staticFiles/js/jspsych-6.0.1/jspsych.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="staticFiles/lib/underscore-min.js" type="text/javascript"></script>
+  <script src="staticFiles/lib/backbone-min.js" type="text/javascript"></script>
+  <script src='jatos.js'></script>
+  <script src="staticFiles/js/papaparse.js" type="text/javascript"></script> <!-- For parsing csv files -->
+  <script src="staticFiles/js/p5.js" type="text/javascript"></script> <!-- Has some statistic commands and some visualization components. Check out their website -->
+  <script src="staticFiles/js/jspsych-6.0.1/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="staticFiles/js/jspsych-6.0.1/plugins/jspsych-html-button-response.js"></script>
+  <script src="staticFiles/js/jspsych-6.0.1/plugins/jspsych-fullscreen.js"></script>
+
+  <!-- Some code just in case some people have javascript disabled -->
+  <noscript>
+      <h1>Warning: Javascript seems to be disabled</h1>
+      <p>This website requires that Javascript be enabled on your browser.</p>
+      <p>Instructions for enabling Javascript in your browser can be found
+      <a href="http://support.google.com/bin/answer.py?hl=en&answer=23852">here</a><p>
+  </noscript>
+
+
+
+
+  <!-- Everything below is the code used in your experiment -->
+  <script>
+
+  // Always start with a timeline
+  var timeline = []
+
+  // // Simple Trial with a decision
+  // var trial1 = {
+  //   type: 'html-keyboard-response',
+  //   stimulus: 'Apple',
+  //   choices:['f','j'], // define what keys to use
+  //   prompt:'Using your keyboard, press F for healthy or J for unhealty food',
+  // }
+  //
+  // timeline.push(trial1)
+  //
+  // var trial2 = {
+  //   type: 'html-keyboard-response',
+  //   stimulus: 'Potato Chips',
+  //   choices:['f','j'], // define what keys to use
+  //   prompt:'Using your keyboard, press F for healthy or J for unhealty food',
+  // }
+  //
+  // timeline.push(trial2)
+  //
+  // var trial3 = {
+  //   type: 'html-keyboard-response',
+  //   stimulus: 'Cake',
+  //   choices:['f','j'], // define what keys to use
+  //   prompt:'Using your keyboard, press F for healthy or J for unhealty food',
+  // }
+  //
+  // timeline.push(trial3)
+  //
+  // var trial4 = {
+  //   type: 'html-keyboard-response',
+  //   stimulus: 'Broccoli',
+  //   choices:['f','j'], // define what keys to use
+  //   prompt:'Using your keyboard, press F for healthy or J for unhealty food',
+  // }
+  //
+  // timeline.push(trial4)
+
+
+
+
+  // // Simple Trial with a decision, but with colored text using inline css formatting
+  // var trial1 = {
+  //   type: 'html-keyboard-response',
+  //   stimulus: 'Apple',
+  //   choices:['f','j'], // define what keys to use
+  //   prompt:'Using your keyboard, press F for <span style="color:green;">healthy</span> or J for <span style="color:red;">unhealty</span> food',
+  // }
+  //
+  // timeline.push(trial1)
+  //
+  // var trial2 = {
+  //   type: 'html-keyboard-response',
+  //   stimulus: 'Potato Chips',
+  //   choices:['f','j'], // define what keys to use
+  //   prompt:'Using your keyboard, press F for <span style="color:green;">healthy</span> or J for <span style="color:red;">unhealty</span> food',
+  // }
+  //
+  // timeline.push(trial2)
+  //
+  // var trial3 = {
+  //   type: 'html-keyboard-response',
+  //   stimulus: 'Cake',
+  //   choices:['f','j'], // define what keys to use
+  //   prompt:'Using your keyboard, press F for <span style="color:green;">healthy</span> or J for <span style="color:red;">unhealty</span> food',
+  // }
+  //
+  // timeline.push(trial3)
+  //
+  // var trial4 = {
+  //   type: 'html-keyboard-response',
+  //   stimulus: 'Broccoli',
+  //   choices:['f','j'], // define what keys to use
+  //   prompt:'Using your keyboard, press F for <span style="color:green;">healthy</span> or J for <span style="color:red;">unhealty</span> food',
+  // }
+  //
+  // timeline.push(trial4)
+
+
+
+
+  // // Simple Trial with a decision, but what if buttons are better?
+  // var trial1 = {
+  //   type: 'html-button-response',
+  //   stimulus: 'Apple',
+  //   choices:['Healthy','Unhealthy'], // define what keys to use
+  //   prompt:'Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+  // }
+  //
+  // timeline.push(trial1)
+  //
+  // var trial2 = {
+  //   type: 'html-button-response',
+  //   stimulus: 'Potato Chips',
+  //   choices:['Healthy','Unhealthy'], // define what keys to use
+  //   prompt:'Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+  // }
+  //
+  // timeline.push(trial2)
+  //
+  // var trial3 = {
+  //   type: 'html-button-response',
+  //   stimulus: 'Cake',
+  //   choices:['Healthy','Unhealthy'], // define what keys to use
+  //   prompt:'Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+  // }
+  //
+  // timeline.push(trial3)
+  //
+  // var trial4 = {
+  //   type: 'html-button-response',
+  //   stimulus: 'Broccoli',
+  //   choices:['Healthy','Unhealthy'], // define what keys to use
+  //   prompt:'Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+  // }
+  //
+  // timeline.push(trial4)
+
+
+
+
+  // // Simple Trial with a decision, but what if we want images?
+  // stims = {
+  //   "Apple":"staticFiles/stims/apple.jpg",
+  //   "Potato":"staticFiles/stims/PotatoChips.jpg",
+  //   "Cake":"staticFiles/stims/Cake.jpg",
+  //   "Broccoli":"staticFiles/stims/Broccoli.jpg",
+  // }
+  // jsPsych.pluginAPI.preloadImages(stims);
+  //
+  //
+  // var trial1 = {
+  //   type: 'html-button-response',
+  //   stimulus: "<img src= '" + stims.Apple + "'></img>",
+  //   choices:['Healthy','Unhealthy'], // define what keys to use
+  //   prompt:'Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+  // }
+  //
+  // timeline.push(trial1)
+  //
+  // var trial2 = {
+  //   type: 'html-button-response', // This image will be really large, swap the below code for the commented out portion to change the size.
+  //   stimulus: "<img style='height:225px;width:225px;' src= '" + stims.Potato + "'></img>",
+  //   choices:['Healthy','Unhealthy'], // define what keys to use
+  //   prompt:'Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+  // }
+  //
+  // timeline.push(trial2)
+  //
+  // var trial3 = {
+  //   type: 'html-button-response',
+  //   stimulus: "<img style='height:225px;width:225px;' src= '" + stims.Cake + "'></img>",
+  //   choices:['Healthy','Unhealthy'], // define what keys to use
+  //   prompt:'Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+  // }
+  //
+  // timeline.push(trial3)
+  //
+  // var trial4 = {
+  //   type: 'html-button-response',
+  //   stimulus: "<img style='height:225px;width:225px;' src= '" + stims.Broccoli + "'></img>",
+  //   choices:['Healthy','Unhealthy'], // define what keys to use
+  //   prompt:'Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+  // }
+  // timeline.push(trial4)
+
+
+
+
+
+  // // Simple Trial with a decision, but what about feedback?
+  // stims = {
+  //   "Apple":"staticFiles/stims/apple.jpg",
+  //   "Potato":"staticFiles/stims/PotatoChips.jpg",
+  //   "Cake":"staticFiles/stims/Cake.jpg",
+  //   "Broccoli":"staticFiles/stims/Broccoli.jpg",
+  // }
+  // jsPsych.pluginAPI.preloadImages(stims);
+  //
+  //
+  // var response = [] // jspsych buttons save as 0,1,2,3.... based on the 'choices' field size from left to right
+  //
+  // var trial1 = {
+  //   type: 'html-button-response',
+  //   stimulus: "<img src= '" + stims.Apple + "'></img>",
+  //   choices:['Healthy','Unhealthy'], // define what keys to use
+  //   prompt:'Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+  //   on_finish: function(data){ // the on_finish will run this function when trial is done. data calls the trial information. Button_pressed is the variable that the info is saved to. This will change based on the plugin used.
+  //     response.push(data.button_pressed)
+  //   }
+  // }
+  //
+  // timeline.push(trial1)
+  //
+  // var feedback1 = {
+  //   type: 'html-keyboard-response',
+  //   stimulus: function(){
+  //     var choice = response[response.length-1] // Gets last item in array, i.e. last choice premade
+  //     var correctChoice = 0 // Healthy
+  //     if (choice == correctChoice){
+  //       var text = 'CORRECT!'
+  //     } else {
+  //       var text = 'INCORRECT!'
+  //     }
+  //     return text
+  //   },
+  //   trial_duration:750, // feedback time
+  //   response_ends_trial:false // dont let a key interupt.
+  // }
+  // timeline.push(feedback1)
+  //
+  // var trial2 = {
+  //   type: 'html-button-response', // This image will be really large, swap the below code for the commented out portion to change the size.
+  //   stimulus: "<img style='height:225px;width:225px;' src= '" + stims.Potato + "'></img>",
+  //   choices:['Healthy','Unhealthy'], // define what keys to use
+  //   prompt:'Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+  //   on_finish: function(data){
+  //     response.push(data.button_pressed)
+  //   }
+  // }
+  //
+  // timeline.push(trial2)
+  //
+  // var feedback2 = {
+  //   type: 'html-keyboard-response',
+  //   stimulus: function(){
+  //     var choice = response[response.length-1] // Gets last item in array, i.e. last choice premade
+  //     var correctChoice = 1 // Unhealthy
+  //     if (choice == correctChoice){
+  //       var text = 'CORRECT!'
+  //     } else {
+  //       var text = 'INCORRECT!'
+  //     }
+  //     return text
+  //   },
+  //   trial_duration:750, // feedback time
+  //   response_ends_trial:false // dont let a key interupt.
+  // }
+  // timeline.push(feedback2)
+  //
+  // var trial3 = {
+  //   type: 'html-button-response',
+  //   stimulus: "<img style='height:225px;width:225px;' src= '" + stims.Cake + "'></img>",
+  //   choices:['Healthy','Unhealthy'], // define what keys to use
+  //   prompt:'Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+  //   on_finish: function(data){
+  //     response.push(data.button_pressed)
+  //   }
+  // }
+  //
+  // timeline.push(trial3)
+  //
+  // var feedback3 = {
+  //   type: 'html-keyboard-response',
+  //   stimulus: function(){
+  //     var choice = response[response.length-1] // Gets last item in array, i.e. last choice premade
+  //     var correctChoice = 1 // Unhealthy
+  //     if (choice == correctChoice){
+  //       var text = 'CORRECT!'
+  //     } else {
+  //       var text = 'INCORRECT!'
+  //     }
+  //     return text
+  //   },
+  //   trial_duration:750, // feedback time
+  //   response_ends_trial:false // dont let a key interupt.
+  // }
+  // timeline.push(feedback3)
+  //
+  // var trial4 = {
+  //   type: 'html-button-response',
+  //   stimulus: "<img style='height:225px;width:225px;' src= '" + stims.Broccoli + "'></img>",
+  //   choices:['Healthy','Unhealthy'], // define what keys to use
+  //   prompt:'Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+  //   on_finish: function(data){
+  //     response.push(data.button_pressed)
+  //   }
+  // }
+  //
+  // timeline.push(trial4)
+  //
+  // var feedback4 = {
+  //   type: 'html-keyboard-response',
+  //   stimulus: function(){
+  //     var choice = response[response.length-1] // Gets last item in array, i.e. last choice premade
+  //     var correctChoice = 0 // Healthy
+  //     if (choice == correctChoice){
+  //       var text = 'CORRECT!'
+  //     } else {
+  //       var text = 'INCORRECT!'
+  //     }
+  //     return text
+  //   },
+  //   trial_duration:750, // feedback time
+  //   response_ends_trial:false // dont let a key interupt.
+  // }
+  // timeline.push(feedback4)
+
+
+
+
+
+  // // This is cool, but long and could lead to problems if it needs to be edited. Can we shorten it?
+  // stims = {
+  //   "Apple":"staticFiles/stims/apple.jpg",
+  //   "Potato":"staticFiles/stims/PotatoChips.jpg",
+  //   "Cake":"staticFiles/stims/Cake.jpg",
+  //   "Broccoli":"staticFiles/stims/Broccoli.jpg",
+  // }
+  // jsPsych.pluginAPI.preloadImages(stims);
+  //
+  //
+  // var response = [] // jspsych buttons save as 0,1,2,3.... based on the 'choices' field size from left to right
+  // var correctArray = [0,1,1,0]
+  // var trialnum = 0
+  //
+  //
+  // var trial = {
+  //   type: 'html-button-response',
+  //   stimulus: function(){
+  //     var img = Object.keys(stims)[trialnum]
+  //     //console.log(img)
+  //     return "<img style='height:225px;width:225px;' src= '" + stims[img] + "'></img>"
+  //   },
+  //   choices:['Healthy','Unhealthy'], // define what keys to use
+  //   prompt:'Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+  //   on_finish: function(data){ // the on_finish will run this function when trial is done. data calls the trial information. Button_pressed is the variable that the info is saved to. This will change based on the plugin used.
+  //     response.push(data.button_pressed)
+  //   }
+  // }
+  //
+  //
+  // var feedback = {
+  //   type: 'html-keyboard-response',
+  //   stimulus: function(){
+  //     var choice = response[response.length-1] // Gets last item in array, i.e. last choice premade
+  //     var correctChoice = correctArray[trialnum] // Healthy
+  //     if (choice == correctChoice){
+  //       var text = 'CORRECT!'
+  //     } else {
+  //       var text = 'INCORRECT!'
+  //     }
+  //     return text
+  //   },
+  //   trial_duration:750, // feedback time
+  //   response_ends_trial:false, // dont let a key interupt.
+  //   on_finish:function(data){
+  //     trialnum+=1 // increment the trial number
+  //   }
+  // }
+  //
+  // for (let i = 0; i < 4; i++){
+  //   timeline.push(trial)
+  //   timeline.push(feedback)
+  // }
+
+
+
+
+  //  now what about saving some data?
+  stims = {
+    "Apple":"staticFiles/stims/apple.jpg",
+    "Potato":"staticFiles/stims/PotatoChips.jpg",
+    "Cake":"staticFiles/stims/Cake.jpg",
+    "Broccoli":"staticFiles/stims/Broccoli.jpg",
+  }
+  jsPsych.pluginAPI.preloadImages(stims);
+
+
+  var response = [] // jspsych buttons save as 0,1,2,3.... based on the 'choices' field size from left to right
+  var correctArray = [0,1,1,0]
+  var trialnum = 0
+
+  // Array to save dataMat
+  var bestChoice = []
+  var stimSeen = []
+
+
+  var trial = {
+    type: 'html-button-response',
+    stimulus: function(){
+      var img = Object.keys(stims)[trialnum]
+      //console.log(img)
+      stimSeen.push(img)
+      return "<img style='height:225px;width:225px;' src= '" + stims[img] + "'></img>"
+    },
+    choices:['Healthy','Unhealthy'], // define what keys to use
+    prompt:'Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+    on_finish: function(data){ // the on_finish will run this function when trial is done. data calls the trial information. Button_pressed is the variable that the info is saved to. This will change based on the plugin used.
+      response.push(Number(data.button_pressed)) // Saves as a string for some reason, this changes it to a number
+    }
+  }
+
+
+  var feedback = {
+    type: 'html-keyboard-response',
+    stimulus: function(){
+      var choice = response[response.length-1] // Gets last item in array, i.e. last choice premade
+      var correctChoice = correctArray[trialnum] // Healthy
+      console.log(choice)
+      console.log(correctChoice)
+      if (choice == correctChoice){
+        var text = 'CORRECT!'
+        bestChoice.push(1)
+      } else {
+        var text = 'INCORRECT!'
+        bestChoice.push(0)
+      }
+      return text
+    },
+    trial_duration:750, // feedback time
+    response_ends_trial:false, // dont let a key interupt.
+    on_finish:function(data){
+      trialnum+=1 // increment the trial number
+    }
+  }
+
+  for (let i = 0; i < 4; i++){
+    timeline.push(trial)
+    timeline.push(feedback)
+  }
+
+  // Now to actually save the data, we have to add some stuff below
+
+
+
+  // // This is for giving credit automatically through SONA
+  // var surveyCode = '';
+  // var creditToken = '';
+  // var studyURLID = 'https://tamupsychology.sona-systems.com/webstudy_credit.aspx?experiment_id=3183&credit_token=94d2b4a0f2a647e8ae4bafe146e07e2a&survey_code='
+  //
+  // var expEnd = {
+  //   type:'html-button-response',
+  //   stimulus:sumPoint,
+  //   choices: ['CONTINUE'],
+  //   button_html:['<button class="jspsych-btn-agree">%choice%</button>'],
+  //   margin_vertical:'20px',
+  //   data: {debrief: 'debrief'},
+  //   on_finish: function() {
+  //     creditToken+=studyURLID
+  //     creditToken+=surveyCode;
+  //     //console.log(creditToken)
+  //   }
+  // }
+  //
+  // var giveCredit = {
+  //   type:'html-button-response',
+  //   stimulus:'Click on the text below for credit.',
+  //   choices:['Click Here'],
+  //   button_html: function() {
+  //     return `<a class="jspsych-btn" type="button" onclick="window.open('${creditToken}', '_blank')">CLICK HERE TO RECEIVE CREDIT</a>`
+  //   },
+  //   margin_vertical: '20px'
+  // }
+  // timeline.push(expEnd)
+  // timeline.push(giveCredit)
+
+
+
+
+
+  // Finally, what if we want to run different conditions? For this we have to use JATOS, wont work locally.
+  // We havc to have a second condition, use jatos, and have a separate file.
+  // In this demo, the other file is called sortCond.html, go there.
+  // We will also need to uncomment the jatos info so itll actually work in jatos.
+
+
+    // // RUN EVERYTHING
+  	jatos.onLoad(function() {
+
+      // // Gets survey code from url in SONA studies
+      surveyCode = jatos.urlQueryParameters.survey_code;
+  		jsPsych.init({
+
+        // This is where each trial that was stored is ran.
+  			timeline: timeline,
+
+
+
+        // When all trials are done run the below to save data
+  			on_finish: function(data){
+
+          //Puts all data we want into a json object to be saved to jatos.
+          var dataMat = {
+            "Trial":trialnum,
+            "Choice":response,
+            "Actual":correctArray,
+            "Correct":bestChoice,
+            "Food":stimSeen
+          }
+
+          //convert the object, and save and end study.
+          var resultJson = JSON.stringify(dataMat);
+          console.log(resultJson)
+          jatos.submitResultData(resultJson, jatos.endStudy)
+  			}
+
+
+
+  		});
+
+
+    });
+
+
+
+  </script>
+  </body>
+  </html>

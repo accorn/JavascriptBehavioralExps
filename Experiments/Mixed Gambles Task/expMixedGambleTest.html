@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="robots" content="noindex">
+  <!--Basic HTML info. All plugins and CSS needs to be called -->
+  <title>Experiment</title>
+  <link href="static/css/jspsychMixedGamble.css" rel="stylesheet" type="text/css"></link>
+</head>
+
+<body>
+  <script src="static/js/jspsych-6.0.1/jspsych.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-multi-select.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-html-button-response.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-multi-choice.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-text.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-likert.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-fullscreen.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="static/lib/jquery-min.js" type="text/javascript"></script>
+  <script src="static/lib/underscore-min.js" type="text/javascript"></script>
+  <script src="static/lib/backbone-min.js" type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-combinatorics@0.5"></script>
+  <!--Below is the experiment javascript file -->
+  <script src='expMixedGambleTest.js'></script>
+  <script src='jatos.js'></script>
+  <noscript>
+              <h1>Warning: Javascript seems to be disabled</h1>
+              <p>This website requires that Javascript be enabled on your browser.</p>
+              <p>Instructions for enabling Javascript in your browser can be found
+              <a href="http://support.google.com/bin/answer.py?hl=en&answer=23852">here</a><p>
+  </noscript>
+  <script>
+
+  	jatos.onLoad(function() {
+  		jsPsych.init({
+  			timeline: timeline,
+
+  			on_finish: function(data){ //edit this for the experiment
+          //var SaveNames = ["reactionTime","netGain","trialGain","trialLoss","choice","totalPoints","binaryChoice","rejectTally"];
+          //var QResp = jsPsych.data.get().select('responses').values;
+          var React = jsPsych.data.get().select('react').values;
+          var Reward = jsPsych.data.get().select('netGain').values;
+          var Gain = jsPsych.data.get().select('rewardGain').values;
+          var Loss = jsPsych.data.get().select('rewardLoss').values;
+          var Choice = jsPsych.data.get().select('keyResponse').values;
+          var Total = jsPsych.data.get().select('total').values;
+          var BinChoice = jsPsych.data.get().select('binChoice').values;
+          var Reject = jsPsych.data.get().select('rejectNum').values;
+          var mgBonus = jsPsych.data.get().select('MGFinal').values;
+
+          var dataMat = {
+            //"SaveNames":SaveNames,
+            "React":React,
+            "NetGain":Reward,
+            "Gain":Gain,
+            "Loss":Loss,
+            "Choice":Choice,
+            "Total":Total,
+            "BinChoice":BinChoice,
+            "Reject":Reject,
+            "BonusAmount":mgBonus
+          }
+          console.log(dataMat)
+          //var resultJson1 = jsPsych.data.get().csv(); //filterCustom({Save_Data: 'Save'}).
+          var resultJson = JSON.stringify(dataMat);
+          //jatos.submitResultData(resultJson)
+          jatos.submitResultData(resultJson, jatos.startNextComponent)
+
+
+  			}
+  		});
+  	//}
+
+  });
+  </script>
+  </body>
+  </html>

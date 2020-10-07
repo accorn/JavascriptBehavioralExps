@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+
+<!-- The below stuff between the <head> tags will likely never need to be changed -->
+<head>
+  <meta charset="utf-8" />
+  <meta name="robots" content="noindex">
+  <title>Experiment</title>
+  <link href="staticFiles/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+</head>
+
+<!-- Below is where the experiment plugins and javascript is coded -->
+<body>
+
+  <!-- Below, are the main .js files that are needed to run, these will never change -->
+  <script src="staticFiles/js/jspsych-6.0.1/jspsych.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="staticFiles/lib/underscore-min.js" type="text/javascript"></script>
+  <script src="staticFiles/lib/backbone-min.js" type="text/javascript"></script>
+  <script src='jatos.js'></script>
+  <script src="staticFiles/js/papaparse.js" type="text/javascript"></script> <!-- For parsing csv files -->
+  <script src="staticFiles/js/p5.js" type="text/javascript"></script> <!-- Has some statistic commands and some visualization components. Check out their website -->
+  <script src="staticFiles/js/jspsych-6.0.1/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="staticFiles/js/jspsych-6.0.1/plugins/jspsych-html-button-response.js"></script>
+  <script src="staticFiles/js/jspsych-6.0.1/plugins/jspsych-fullscreen.js"></script>
+
+  <!-- Some code just in case some people have javascript disabled -->
+  <noscript>
+      <h1>Warning: Javascript seems to be disabled</h1>
+      <p>This website requires that Javascript be enabled on your browser.</p>
+      <p>Instructions for enabling Javascript in your browser can be found
+      <a href="http://support.google.com/bin/answer.py?hl=en&answer=23852">here</a><p>
+  </noscript>
+
+
+
+
+  <!-- Everything below is the code used in your experiment -->
+  <script>
+
+  // Always start with a timeline
+  var timeline = []
+
+
+  //  now what about saving some data?
+  stims = {
+    "Apple":"staticFiles/stims/apple.jpg",
+    "Potato":"staticFiles/stims/PotatoChips.jpg",
+    "Cake":"staticFiles/stims/Cake.jpg",
+    "Broccoli":"staticFiles/stims/Broccoli.jpg",
+  }
+  jsPsych.pluginAPI.preloadImages(stims);
+
+
+  var response = [] // jspsych buttons save as 0,1,2,3.... based on the 'choices' field size from left to right
+  var correctArray = [0,1,1,0]
+  var trialnum = 0
+
+  // Array to save dataMat
+  var bestChoice = []
+  var stimSeen = []
+
+
+  var trial = {
+    type: 'html-button-response',
+    stimulus: function(){
+      var img = Object.keys(stims)[trialnum]
+      //console.log(img)
+      stimSeen.push(img)
+      return "<img style='height:225px;width:225px;' src= '" + stims[img] + "'></img>"
+    },
+    choices:['Healthy','Unhealthy'], // define what keys to use
+    prompt:'This is condition 2! Using a button, is this food <span style="color:green;">healthy</span> or <span style="color:red;">unhealty</span>',
+    on_finish: function(data){ // the on_finish will run this function when trial is done. data calls the trial information. Button_pressed is the variable that the info is saved to. This will change based on the plugin used.
+      response.push(Number(data.button_pressed)) // Saves as a string for some reason, this changes it to a number
+    }
+  }
+
+
+  var feedback = {
+    type: 'html-keyboard-response',
+    stimulus: function(){
+      var choice = response[response.length-1] // Gets last item in array, i.e. last choice premade
+      var correctChoice = correctArray[trialnum] // Healthy
+      console.log(choice)
+      console.log(correctChoice)
+      if (choice == correctChoice){
+        var text = 'CORRECT!'
+        bestChoice.push(1)
+      } else {
+        var text = 'INCORRECT!'
+        bestChoice.push(0)
+      }
+      return text
+    },
+    trial_duration:750, // feedback time
+    response_ends_trial:false, // dont let a key interupt.
+    on_finish:function(data){
+      trialnum+=1 // increment the trial number
+    }
+  }
+
+  for (let i = 0; i < 4; i++){
+    timeline.push(trial)
+    timeline.push(feedback)
+  }
+
+  // Now to actually save the data, we have to add some stuff below
+
+
+
+
+
+
+
+
+    // RUN EVERYTHING
+  	jatos.onLoad(function() {
+
+      // Gets survey code from url in SONA studies
+      //surveyCode = jatos.urlQueryParameters.survey_code;
+  		jsPsych.init({
+
+        // This is where each trial that was stored is ran.
+  			timeline: timeline,
+
+
+
+        // When all trials are done run the below to save data
+  			on_finish: function(data){
+
+          //Puts all data we want into a json object to be saved to jatos.
+          var dataMat = {
+            "Trial":trialnum,
+            "Choice":response,
+            "Actual":correctArray,
+            "Correct":bestChoice,
+            "Food":stimSeen
+          }
+
+          //convert the object, and save and end study.
+          var resultJson = JSON.stringify(dataMat);
+          //console.log(resultJson)
+          jatos.submitResultData(resultJson, jatos.endStudy)
+  			}
+
+
+
+  		});
+
+
+    });
+  </script>
+  </body>
+  </html>

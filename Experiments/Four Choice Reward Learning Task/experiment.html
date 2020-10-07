@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="robots" content="noindex">
+  <!--Basic HTML info. All plugins and CSS needs to be called -->
+   <title>Experiment</title> <!--Whats shown in the internet tab. -->
+   <!-- Location of the CSS file that changes what is seen graphically. This file can be modified -->
+  <link href="static/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+</head>
+
+<body>
+  <!-- Below are scripts that call jspsych functions and other javascript libraries -->
+  <script src="static/js/jspsych-6.0.1/jspsych.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-multi-select.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-multi-choice.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-text.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-likert.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-fullscreen.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <!-- All of the below libraries are required -->
+  <script src="static/lib/jquery-min.js" type="text/javascript"></script>
+  <script src="static/lib/underscore-min.js" type="text/javascript"></script>
+  <script src="static/lib/backbone-min.js" type="text/javascript"></script>
+  <!--Below is the experiment javascript file -->
+  <script src='templateExp.js'></script>
+  <script src='jatos.js'></script>
+  <noscript>
+              <h1>Warning: Javascript seems to be disabled</h1>
+              <p>This website requires that Javascript be enabled on your browser.</p>
+              <p>Instructions for enabling Javascript in your browser can be found
+              <a href="http://support.google.com/bin/answer.py?hl=en&answer=23852">here</a><p>
+  </noscript>
+  <script>
+  	jatos.onLoad(function() {
+  		jsPsych.init({
+  			timeline: timeline,
+  			on_finish: function(data){
+          // The below calls the trial data from the data structure.
+          // Use the jspsych.data.get().select('<VarName>').values to call the data into a form that can be combined and saved
+          var SaveNames = ["reward","bestOption","keyResponse","setSeen","probValue","trialPhase","Questionnaire"]
+          var QResp = jsPsych.data.get().select('responses').values;
+          var Reward = jsPsych.data.get().select('reward').values;
+          var BestOption = jsPsych.data.get().select('bestOption').values;
+          var KeyResponse = jsPsych.data.get().select('keyResponse').values;
+          var SetSeen = jsPsych.data.get().select('setSeen').values;
+          var SetOrder = jsPsych.data.get().select('setOrder').values;
+          var ProbValue = jsPsych.data.get().select('probValue').values;
+          var EffResp = jsPsych.data.get().select('response').values;
+          var TrialPhase = jsPsych.data.get().select('trialPhase').values;
+          // Combines all of the trial data with semicolon separators
+          var dataMat = SaveNames.concat(";",Reward,";",BestOption,";",KeyResponse,";",SetSeen,";",SetOrder,";",ProbValue,";",TrialPhase,";",QResp);
+          var resultJson = JSON.stringify(dataMat); // Converts the data matrix to JSON
+          jatos.submitResultData(resultJson, jatos.startNextComponent) // sends the data to jatos and moves to next component if there is one.
+  			}
+  		});
+  });
+  </script>
+  </body>
+  </html>

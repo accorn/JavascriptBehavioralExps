@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="robots" content="noindex">
+  <!--Basic HTML info. All plugins and CSS needs to be called -->
+  <title>Experiment</title>
+  <link href="static/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+</head>
+
+<body>
+  <script src="static/js/jspsych-6.0.1/jspsych.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-html-button-response.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-multi-select.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-multi-choice.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-text.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-survey-likert.js"></script>
+  <script src="static/js/jspsych-6.0.1/plugins/jspsych-fullscreen.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="static/lib/jquery-min.js" type="text/javascript"></script>
+  <script src="static/lib/underscore-min.js" type="text/javascript"></script>
+  <script src="static/lib/backbone-min.js" type="text/javascript"></script>
+  <!--Below is the experiment javascript file -->
+  <script src='jatos.js'></script>
+  <noscript>
+              <h1>Warning: Javascript seems to be disabled</h1>
+              <p>This website requires that Javascript be enabled on your browser.</p>
+              <p>Instructions for enabling Javascript in your browser can be found
+              <a href="http://support.google.com/bin/answer.py?hl=en&answer=23852">here</a><p>
+  </noscript>
+  <script>
+
+    var timeline = []
+    var trialnum = 0
+    // Number of survey items wanted to show on screen. Will accept values that produce a remainder
+    var numPerPage = 3
+    var respMat = []
+    var question = ''
+    var instructText = '<p>This survey will ask you to rate how characteristic of you some phrases are. There are no right or wrong answers, so please answer as truthfully as possible.</p><p>Press any key to begin...</p>'
+    var IUSRs = ['Not at all characteristic of me', 'Not very characteristic of me', 'Somewhat characteristic of me', 'Slightly characteristic of me', 'Entirely  characteristic  of  me']
+    var IUSQs = [
+      //'Uncertainty stops me from having a strong opinion.',
+      //'Being uncertain means that a person is disorganized.',
+      'Uncertainty makes life intolerable.',
+      //'It’s unfair having no guarantees in life.',
+      'My mind can’t be relaxed if I don’t know what will happen tomorrow.',
+      'Uncertainty makes me uneasy, anxious, or stressed.',
+      //'Unforeseen events upset me greatly.',
+      //'It frustrates me not having all the information I need.',
+      'Uncertainty keeps me from living a full life.',
+      //'One should always look ahead so as to avoid surprises.',
+      //'A small unforeseen event can spoil everything, even with the best planning.',
+      'When it’s time to act, uncertainty paralyses me.',
+      //'Being uncertain means that I am not first rate.',
+      'When I am uncertain, I can’t go forward.',
+      'When I am uncertain, I can’t function very well.',
+      'Unlike me, others seem to know where they are going with their lives.',
+      'Uncertainty makes me vulnerable, unhappy, or sad.',
+      //'I always want to know what the future has in store for me.',
+      //'I can’t stand being taken by surprise.',
+      //'The smallest doubt can stop me from acting.',
+      //'I should be able to organize everything in advance.',
+      //'Being uncertain means that I lack confidence.',
+      //'I think it’s unfair that other people seem to be sure about their future.',
+      //'Uncertainty keeps me from sleeping soundly.',
+      //'I must get away from all uncertain situations.',
+      //'The ambiguities in life stress me.',
+      //'I can’t stand being undecided about my future.'
+    ]
+
+    // Vars that let us show the proper number of items per fullPages
+    // In the event that there are leftover questions, these vars Will
+    // make it to where those last items are shown by themselves
+    var iter = []
+    var iterPos = 0
+    var lastItems = IUSQs.length%numPerPage
+    var fullPages = (IUSQs.length-lastItems)/numPerPage
+    for (let i = 0; i < fullPages; i++) {
+      iter.push(numPerPage)
+    }
+    if (lastItems > 0){
+      iter.push(lastItems)
+    }
+
+      var sumFunc = (a,b) => a+b
+      var getQs = function(){
+        // Generate the correct number of items to show on screen
+        var QMat = []
+        for (let i = 0; i < iter[iterPos]; i++) {
+          QMat.push({prompt: IUSQs[trialnum+i], name: 'IUS', options: IUSRs, required:true, horizontal: true})
+        }
+          return QMat
+        }
+
+      var trialSave = function(){
+
+
+        //var F1mat = [respMat[0],respMat[8],respMat[11],respMat[12],respMat[13],respMat[14],respMat[15],respMat[19],respMat[21],respMat[24]]
+        //var F2mat = [respMat[1],respMat[2],respMat[3],respMat[4],respMat[5],respMat[6],respMat[7],respMat[8],respMat[14],respMat[16],respMat[23],respMat[25]]
+        //var F3mat = [respMat[6],respMat[7],respMat[9],respMat[10],respMat[17],respMat[18],respMat[20]]
+        //var F4mat = [respMat[6],respMat[15],respMat[17],respMat[22],respMat[26]]
+
+        var IUSTotal = respMat.reduce(sumFunc)
+        //var F1Total = F1mat.reduce(sumFunc)
+        //var F2Total = F2mat.reduce(sumFunc)
+        //var F3Total = F3mat.reduce(sumFunc)
+        //var F4Total = F4mat.reduce(sumFunc)
+
+        return {
+          "IUSResp":respMat,
+          "IUSScore":IUSTotal//,
+          //"F1":F1Total,
+          //"F2":F2Total,
+          //"F3":F3Total,
+          //"F4":F4Total
+        }
+      }
+
+      var instrux = {
+        type: 'html-keyboard-response',
+        stimulus: instructText,
+        response_ends_trial: true
+      }
+
+      var multi_choice_block = {
+        type: 'survey-multi-choice',
+        questions: getQs,
+        on_finish:function(data){
+          trialnum = trialnum + numPerPage
+          iterPos = iterPos+1
+
+          var trialResp = JSON.parse(data.responses)
+
+          var ind = []
+          for (let i = 0; i < iter[iterPos-1]; i++) {
+            ind.push(trialResp["Q"+i])
+          }
+
+          // Convert strings to numeric values and save
+          for (let i = 0; i < (ind.length); i++) {
+            respMat.push(IUSRs.indexOf(ind[i])+1)
+          }
+        }
+      };
+
+      var blackScreen = {
+        type: 'html-keyboard-response',
+        stimulus: '',
+        trial_duration: 500
+      }
+
+      var saveData = {
+        type: 'html-keyboard-response',
+        stimulus: 'You have completed this survey and earned $0.50 more cents. Press any key to end...',
+        data: trialSave,
+        response_ends_trial: true
+      }
+
+
+      timeline.push(instrux)
+
+      for (let i = 0; i < iter.length; i++) {
+        timeline.push(multi_choice_block)
+        timeline.push(blackScreen)
+      }
+      timeline.push(saveData)
+
+  	jatos.onLoad(function() {
+  		jsPsych.init({
+  			timeline: timeline,
+
+  			on_finish: function(data){ //edit this for the experiment
+
+          var dataMat = {
+            "IUSResp":jsPsych.data.get().select('IUSResp').values,
+            "IUSScore":jsPsych.data.get().select('IUSScore').values//,
+            //"F1":jsPsych.data.get().select('F1').values,
+            //"F2":jsPsych.data.get().select('F2').values,
+            //"F3":jsPsych.data.get().select('F3').values,
+            //"F4":jsPsych.data.get().select('F4').values
+          }
+          //console.log(dataMat)
+          //var resultJson1 = jsPsych.data.get().csv(); //filterCustom({Save_Data: 'Save'}).
+          var resultJson = JSON.stringify(dataMat);
+          jatos.submitResultData(resultJson, jatos.endStudy)
+  			}
+  		});
+  	//}
+
+  });
+  </script>
+  </body>
+  </html>

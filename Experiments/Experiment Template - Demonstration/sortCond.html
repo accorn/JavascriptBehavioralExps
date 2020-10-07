@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="pure-release-0.6.0/pure-min.css">
+  <link rel="stylesheet" href="staticFiles/css/sort.css">
+  <title>Experiment</title>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="jatos.js"></script>
+
+</head>
+
+  <body>
+	  <p>When you are ready to begin, press the button below to view the experiment instructions</p>
+	  <button id="continueButton" class="pure-button" disabled>Continue</button>
+
+
+    <script>
+    	jatos.onLoad(function () {
+    		initBatchConditions();
+    		$('#continueButton').prop('disabled', false);
+    	});
+
+    	// We use JATOS' Batch Session to store which conditions are available.
+    	// If this is the first run we have to initialize the Batch Session with
+    	// the data from the component's JSON input. You can 'reset' the conditions
+    	// by deleting them from the Batch Session.
+
+      //Under the properties tab of this html file component in jatos, add the following json text to the json field at the bottom.
+      //  {
+      //    "conditionCounts": {
+      //    "A": 10,
+      //    "B": 10 // A and B is arbitrary, can be whatever string you want.
+      //    }
+      //  }
+      // WHere A and B (or more if you add them), are arbitrary conditions, and the numbers are however, many people you want for each condition
+
+
+      // if the conditions do not exist, we create them. Can sort of be edited later
+    	function initBatchConditions() {
+    		// Check if 'conditions' are not already in the batch session
+    		if (!jatos.batchSession.defined("/conditions")) {
+    			// Get the count of each condition
+    			var conditionCounts = jatos.componentJsonInput.conditionCounts;
+          var conditions = []
+    			// Fill the array with conditions according to the counters
+    			fillArrayWithValues(conditions, "A", conditionCounts.A); // The string will correspond to whatever is define earlier. Can be anything you want.
+    			fillArrayWithValues(conditions, "B", conditionCounts.B);
+    			// Put the conditions in the batch session
+    			jatos.batchSession.set("conditions", conditions)
+    				.fail(initBatchConditions); // If it fails: try again
+    		}
+    	}
+
+      // Itll fill an array with the defined number of condition instances
+    	function fillArrayWithValues(array, value, count) {
+    		for (var i = 0; i < count; i++) {
+    			array.push(value);
+    		}
+    	}
+
+    	$('#continueButton').click(function () {
+    		var nextCondition = getNextCondition();
+    		var nextComponentPosition;
+    		switch (nextCondition) {
+    			case "A":
+    				nextComponentPosition = 2; // This is the actual component position in jatos. The number next to the file name.
+    				break;
+    			case "B":
+    				nextComponentPosition = 3;
+    				break;
+    		}
+
+    		var resultData = nextCondition;
+    		jatos.submitResultData(resultData, function () {
+    			jatos.startComponentByPos(nextComponentPosition);
+    		});
+    	})
+
+
+      // Starts the correct condition. Chooses one at random, can be made to run sequentially though. 
+    	function getNextCondition() {
+    		// Get the still available conditions from the Batch Session
+    		var conditions = jatos.batchSession.get("conditions");
+    		// If no more conditions throw an error
+    		if (conditions.length == 0) {
+    			$('p').text("Error: max number of workers reached.");
+    			throw "Max number of workers reached.";
+    		}
+    		// Get a random condition
+    		var randomIndex = Math.floor(Math.random() * conditions.length);
+    		var randomCondition = conditions[randomIndex];
+    		// Delete the choosen condition from the array
+    		conditions.splice(randomIndex, 1);
+    		// Set the changed conditions array in the Batch Session.
+    		jatos.batchSession.set("conditions", conditions).fail(function () {
+    			randomCondition = getNextCondition(); // If it fails: try again
+    		});
+    		return randomCondition;
+    	}
+    </script>
+  </body>
+</html>
